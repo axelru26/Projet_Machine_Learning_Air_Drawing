@@ -14,7 +14,7 @@ def vider_dossier(dossier):
         os.makedirs(dossier)
 
 # === 0. Définition des chemins ===
-video_path = '/Users/flobaillien/DocumentsPC/HEPL/Machine-learning/Projet_Machine_Learning_Air_Drawing/convert/videos/Lettres/L.mp4'
+video_path = '/Users/flobaillien/DocumentsPC/HEPL/Machine-learning/Projet_Machine_Learning_Air_Drawing/convert/videos/Lettres/C.mp4'
 extracted_dir = '/Users/flobaillien/DocumentsPC/HEPL/Machine-learning/Projet_Machine_Learning_Air_Drawing/convert/images_extraites'
 finger_dir = '/Users/flobaillien/DocumentsPC/HEPL/Machine-learning/Projet_Machine_Learning_Air_Drawing/convert/finger_find'
 frame_interval = 5
