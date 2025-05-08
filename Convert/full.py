@@ -14,10 +14,13 @@ def vider_dossier(dossier):
         os.makedirs(dossier)
 
 # === 0. Définition des chemins ===
-video_path = '/Users/flobaillien/DocumentsPC/HEPL/Machine-learning/Projet_Machine_Learning_Air_Drawing/convert/videos/Lettres/L.mp4'
-extracted_dir = '/Users/flobaillien/DocumentsPC/HEPL/Machine-learning/Projet_Machine_Learning_Air_Drawing/convert/images_extraites'
-finger_dir = '/Users/flobaillien/DocumentsPC/HEPL/Machine-learning/Projet_Machine_Learning_Air_Drawing/convert/finger_find'
-frame_interval = 5
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+print(BASE_DIR)
+video_path = os.path.join(BASE_DIR, 'videos/Lettres/I.mp4')
+extracted_dir = os.path.join(BASE_DIR, 'images_extraites')
+finger_dir = os.path.join(BASE_DIR, 'finger_find')
+frame_interval = 2
 
 # === 1. Nettoyage des dossiers ===
 vider_dossier(extracted_dir)
@@ -52,9 +55,12 @@ cap.release()
 print(f"{saved_count} images extraites dans le dossier '{extracted_dir}'")
 
 # === 3. Détection du bout de l'index ===
+trace_points = []
+img_shape = None
 detector = HandDetector(staticMode=True, maxHands=1, detectionCon=0.7)
 
-for filename in os.listdir(extracted_dir):
+#for filename in os.listdir(extracted_dir):
+for filename in sorted(os.listdir(extracted_dir)):
     if not filename.endswith(('.jpg', '.png')):
         continue
 
@@ -67,35 +73,41 @@ for filename in os.listdir(extracted_dir):
         lm_list = hand['lmList']
         if len(lm_list) >= 9:
             x, y = lm_list[8][0], lm_list[8][1]
-            cv2.circle(img, (x, y), 10, (0, 0, 255), -1)
+            trace_points.append((x, y))
 
-    cv2.imwrite(os.path.join(finger_dir, filename), img)
+    #cv2.imwrite(os.path.join(finger_dir, filename), img)
 
 # === 4. Génération de l'image composite ===
-sample_img = cv2.imread(os.path.join(finger_dir, os.listdir(finger_dir)[0]))
-height, width, _ = sample_img.shape
+#sample_img = cv2.imread(os.path.join(finger_dir, os.listdir(finger_dir)[0]))
+if img_shape is None:
+    img_shape = image.shape
+
+height, width, _ = img_shape
 result = np.zeros((height, width, 3), dtype=np.uint8)
 
-for filename in os.listdir(finger_dir):
-    if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-        path = os.path.join(finger_dir, filename)
-        img = cv2.imread(path)
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+for i in range(1, len(trace_points)):
+    cv2.line(result, trace_points[i - 1], trace_points[i], (0, 0, 255), thickness=6)
 
-        lower_red1 = np.array([0, 100, 100])
-        upper_red1 = np.array([10, 255, 255])
-        lower_red2 = np.array([160, 100, 100])
-        upper_red2 = np.array([180, 255, 255])
-
-        mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
-        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
-        mask = mask1 | mask2
-
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if contours:
-            biggest = max(contours, key=cv2.contourArea)
-            if cv2.contourArea(biggest) > 0:
-                cv2.drawContours(result, [biggest], -1, (0, 0, 255), -1)
+#for filename in os.listdir(finger_dir):
+#    if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+#        path = os.path.join(finger_dir, filename)
+#        img = cv2.imread(path)
+#        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+#
+#        lower_red1 = np.array([0, 100, 100])
+#        upper_red1 = np.array([10, 255, 255])
+#        lower_red2 = np.array([160, 100, 100])
+#        upper_red2 = np.array([180, 255, 255])
+#
+#        mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+#        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+#        mask = mask1 | mask2
+#
+#        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+#        if contours:
+#            biggest = max(contours, key=cv2.contourArea)
+#            if cv2.contourArea(biggest) > 0:
+#                cv2.drawContours(result, [biggest], -1, (0, 0, 255), -1)
 
 # === 5. Rotation de 90° vers la droite ===
 rotated = cv2.rotate(result, cv2.ROTATE_90_CLOCKWISE)
@@ -104,5 +116,5 @@ rotated = cv2.rotate(result, cv2.ROTATE_90_CLOCKWISE)
 mirrored = cv2.flip(rotated, 1)
 
 # === 7. Sauvegarde de l'image finale ===
-cv2.imwrite("image_resultat.png", mirrored)
+cv2.imwrite("../image_resultat.png", mirrored)
 print("Image finale enregistrée sous 'image_resultat.png' (rotation + effet miroir)")
