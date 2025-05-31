@@ -47,7 +47,7 @@ def thicken_mask(mask, size=3):
     return cv2.dilate(mask, kernel, iterations=1)
 
 # Step 6: Resize and center
-def center_and_resize(mask, output_size=128, margin=10):
+def center_and_resize(mask, output_size=28, margin=2):
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if not contours:
         return np.ones((output_size, output_size), dtype=np.uint8) * 255
