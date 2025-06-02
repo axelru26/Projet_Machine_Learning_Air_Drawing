@@ -1,3 +1,5 @@
 /Result/Step_Convertion/
 /Datasets/emnist_datasets/
 .venv
+.venv-py311
+.venv312
