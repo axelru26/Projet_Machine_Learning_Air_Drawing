@@ -1,5 +1,3 @@
-/venv-py311
-venv312/
-/Convert/images_extraites/
-/data/EMNIST/raw/
-/Convert/finger_find/
+/Result/Step_Convertion/
+/Datasets/emnist_datasets/
+.venv
