@@ -2,4 +2,6 @@
 /Datasets/emnist_datasets/
 .venv
 .venv-py311
+/venv-py311/
 .venv312
+/venv312/
