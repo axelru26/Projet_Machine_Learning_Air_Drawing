@@ -1,5 +1,6 @@
 /Result/Step_Convertion/
 /Datasets/emnist_datasets/
+/data/*
 .venv
 .venv-py311
 /venv-py311/
